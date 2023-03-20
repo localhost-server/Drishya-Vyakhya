@@ -1,1 +1,4 @@
-
+speechbrain
+pillow
+pygame
+streamlit
