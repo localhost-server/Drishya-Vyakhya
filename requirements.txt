@@ -2,3 +2,4 @@ speechbrain
 pillow
 pygame
 streamlit
+streamlit-webrtc
