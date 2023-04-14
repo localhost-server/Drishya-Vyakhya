@@ -64,7 +64,7 @@ h1 {
     """,
     unsafe_allow_html=True
 )
-text = '<h1 style="text-align:center; animation: changeColor 20s infinite; transform-style: preserve-3d; perspective: 100px; transform-origin: 40% 60%;">🔠Caption👀Images🖼</h1>'
+text = '<h1 style="text-align:center; animation: changeColor 20s infinite; transform-style: preserve-3d; perspective: 100px; transform-origin: 40% 60%;">🖼Drishya👀Vyakhya🔠</h1>'
 st.markdown(text, unsafe_allow_html=True)
 css = """
 @keyframes changeColor {
