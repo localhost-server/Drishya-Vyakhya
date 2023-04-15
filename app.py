@@ -136,8 +136,9 @@ num_beams = 4
 gen_kwargs = {"max_length": max_length, "num_beams": num_beams}
 
 def caption(img):
-    inputs = load_processor()(images=img, return_tensors="pt").pixel_values.to("cuda")    
-    out = load_model().generate(pixel_values=inputs,**gen_kwargs)
+    inputs = load_processor()(images=img, return_tensors="pt").pixel_values.to("cuda")
+    model = load_model()
+    out = model.generate(pixel_values=inputs,**gen_kwargs)
     return load_processor().batch_decode(out, skip_special_tokens=True)[0]
 
 if img:
