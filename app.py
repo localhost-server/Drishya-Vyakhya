@@ -1,7 +1,8 @@
 """DO REMEMBER TO TURN ON THE LIVE SERVER"""
 
 import streamlit as st
-from transformers import VisionEncoderDecoderModel, ViTFeatureExtractor, AutoTokenizer
+from transformers import AutoProcessor, AutoModelForCausalLM
+
 from PIL import Image
 from audio import *
 import os
@@ -64,7 +65,7 @@ h1 {
     """,
     unsafe_allow_html=True
 )
-text = '<h1 style="text-align:center; animation: changeColor 20s infinite; transform-style: preserve-3d; perspective: 100px; transform-origin: 40% 60%;">🖼Drishya👀Vyakhya🔠</h1>'
+text = '<h1 style="text-align:center; animation: changeColor 20s infinite; transform-style: preserve-3d; perspective: 100px; transform-origin: 40% 60%;">🔠Caption👀Images🖼</h1>'
 st.markdown(text, unsafe_allow_html=True)
 css = """
 @keyframes changeColor {
@@ -104,18 +105,18 @@ elif mode=="File Upload":
 
 # LOAD PROCESSOR
 def load_processor():
-    feature_extractor = ViTFeatureExtractor.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
-    return feature_extractor
+    processor = AutoProcessor.from_pretrained("microsoft/git-large")
+    return processor
 
 # LOAD MODEL
 def load_model():
-    model = VisionEncoderDecoderModel.from_pretrained("nlpconnect/vit-gpt2-image-captioning")#.to("cuda")
+    model = AutoModelForCausalLM.from_pretrained("microsoft/git-large").to('cuda')
     return model
 
 # LOAD TOKENIZER
-def tokenize():
-    tokenizer = AutoTokenizer.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
-    return tokenizer
+# def tokenize():
+#     tokenizer = AutoTokenizer.from_pretrained("microsoft/git-base")
+#     return tokenizer
 
 # PLAY AUDIO
 def playaud():
@@ -130,29 +131,14 @@ def playaud():
     audio.quit()
 
 # Define Function to return decoded output
-
-max_length = 16
+max_length = 50
 num_beams = 4
 gen_kwargs = {"max_length": max_length, "num_beams": num_beams}
 
 def caption(img):
-    inputs = load_processor()(img, return_tensors="pt").pixel_values#.to("cuda")
-    out = load_model().generate(inputs,**gen_kwargs)
-    return tokenize().batch_decode(out, skip_special_tokens=True)[0]
-
-# ENABLE DISABLE AUDIO
-# if st.button('🔇'):
-#         if st.session_state.get('get_aud', True):
-#             st.session_state.get_aud = False
-#         else:
-#             st.session_state.get_aud = True
-
-# Download Button setup
-# if st.button('⏬🔉'):
-#     if st.session_state.get('function_enabled', True):
-#         st.session_state.function_enabled = False
-#     else:
-#         st.session_state.function_enabled = True
+    inputs = load_processor()(images=img, return_tensors="pt").pixel_values.to("cuda")    
+    out = load_model().generate(pixel_values=inputs,**gen_kwargs)
+    return load_processor().batch_decode(out, skip_special_tokens=True)[0]
 
 if img:
     if os.path.exists("example.wav"):
@@ -175,15 +161,4 @@ if img:
     torchaudio.save("example.wav",waveforms.squeeze(1),sample_rate=22200)
     st.audio("example.wav")
     # torch.cuda.empty_cache()
-   
-#     # playsound("example.wav")
-#     # if st.session_state.get('get_audc', True):
-#     #     playaud()
 
-
-    # # Download File
-    # if st.session_state.get('function_enabled', True):
-    #     if os.path.exists("example.wav"):
-    #         st.audio("example.wav")
-    #     else:
-    #         pass
